@@ -1,0 +1,136 @@
+//userModel.js
+const  mongoose = require("mongoose");
+
+
+const userSchema = mongoose.Schema({ 
+	username:{				
+		type: String,
+		required: [true, 'Please add a username.'],
+		unique: true
+	}, 		
+	email:{		
+		type: String,
+        	required: [true, "you must add an email"],
+        	unique: true,
+        	trim: true,
+        	match:[/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            	"Please enter a valid email"]
+	}, 					
+	password:{
+		type: String
+		required: [true, "You must add a password"],
+        	minLength: [6, "Password atleast 6 characters"]
+	},						
+	usertype:{type: String},		
+}, {
+	timestamps:true,
+})
+
+
+----------------------------------------------------------------------------------------------------------------------
+//itemModel.js	(ITEM MASTER LIST)
+const  mongoose = require("mongoose");
+
+
+const itemSchema = mongoose.Schema({
+	barcode:{type: String},			//barcode value 	*required
+	name:{type: String},			//name			*required
+	stocklvl:{type: String},		//number of available	*required
+	manufacturer:{type: String},		//brand name		*required
+	vendor:{type: String},			//vendor name		*required
+	itemdesc:{type: String},		//description of item	*not required
+},{
+	timestamps:true,
+});
+
+const Items = mongose.model("items", itemSchema);
+module.exports = Items;
+
+
+---------------------------------------------------------------------------------------------------------------------
+//ordersModel.js (ITEMS THAT ARE ORDERED)
+const  mongoose = require("mongoose");
+const {ObjectId} = mongoose.Schema
+
+const ordersSchema = mongoose.Schema({
+	orderno:{type: String},			//order number		
+	item: {					//import from itemModel.js
+		type: ObjectId,
+		ref: "items"
+	},
+	orderdate:{type :Date},			//order date 
+	orderstat:{type :String}		//order status ("Order Received" button will update its status)
+},{
+	timestamps:true,
+});
+
+const Orders = mongoose.model("orders", ordersSchema);
+module.exports = Orders;
+	
+	
+---------------------------------------------------------------------------------------------------------------------
+//returnsModel.js (ITEMS THAT ARE RETURNED)
+const  mongoose = require("mongoose");		
+const {ObjectId} = mongoose.Schema
+
+const returnsSchema = mongoose.Schema({
+	returnno:{type: String},		//return item
+	item: {					//import from itemModel.js
+		type: ObjectId,
+		ref: "items"
+	},
+	returndate:{type: Date},		//return date
+	returnstat:{type: String}		//return status ("Return Succesful" button will update its status)
+},{
+	timestamps:true,
+});
+
+const Returns = mongoose.model("returns", returnsSchema);
+module.exports = Returns;
+
+---------------------------------------------------------------------------------------------------------------------
+//archivesModel.js (ITEMS THAT ARE INACTIVE AND NO LONGER USED)
+const  mongoose = require("mongoose");		
+const {ObjectId} = mongoose.Schema
+
+const archivesSchema = mongoose.Schema({
+	archdate:{type: Date},			//archived date
+	item: {					//import from itemModel.js
+		type: ObjectId,
+		ref: "items"
+	},
+},{
+	timestamps:true,
+});
+
+const Archives = mongoose.model("archives", archivesSchema);
+module.exports = Archives;
+
+
+---------------------------------------------------------------------------------------------------------------------
+//manufacturerModel.js (MANUFACTURER INFORMATION)
+const  mongoose = require("mongoose");		
+
+const manufacturerSchema = mongoose.Schema({
+	mfrname:{type: String},			//Manufacturer information
+	mfraddress:{type: String},		//Manufacturer address
+	mfrsite:{				//Manufacturer website
+		type: String,
+		required: 'URL can\'t be empty,
+		unique:	true
+	},
+	description:{type: String},		//import from itemModel.js
+},{
+	timestamps:true,
+});
+manufacturerSchema.path('mfrsite').validate((val) => {
+    urlRegex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
+    return urlRegex.test(val);
+}, 'Invalid URL.');
+
+const Manufacturer = mongoose.model("manufacturer", manufacturerSchema);
+module.exports = Manufacturer;
+
+
+
+

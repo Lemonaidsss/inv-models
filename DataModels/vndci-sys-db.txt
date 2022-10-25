@@ -1,0 +1,7 @@
+vndci-sys
+
+
+USER NAME: vndci-sys-db
+PASSWORD: vndci-sys-db
+
+
